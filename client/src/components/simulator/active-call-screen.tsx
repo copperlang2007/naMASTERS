@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PhoneOff, Headphones, User } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { TranscriptSegment } from "./simulator-types";
+import type { TranscriptSegment } from "@/lib/simulator-types";
 
 interface ActiveCallScreenProps {
   transcript: TranscriptSegment[];

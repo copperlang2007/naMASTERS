@@ -6,12 +6,12 @@ import type {
   CallScore,
   TranscriptSegment,
   DiscoveryChecklist,
-} from "./simulator-types";
+} from "@/lib/simulator-types";
 import {
   DOROTHY_GROUND_TRUTH,
   CHECKLIST_LABELS,
   DIMENSION_LABELS,
-} from "./simulator-types";
+} from "@/lib/simulator-types";
 
 interface PostCallDebriefProps {
   score: CallScore;

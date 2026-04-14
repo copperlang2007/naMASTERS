@@ -1,13 +1,14 @@
 import asyncio
 import json
 import os
+from pathlib import Path
 import websockets
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 import uvicorn
 from dotenv import load_dotenv
-from dorothy import DOROTHY_PERSONA, ANCHOR_WHISPER
+from server.personas.dorothy import DOROTHY_PERSONA, ANCHOR_WHISPER
 
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -17,7 +18,8 @@ app = FastAPI()
 # Serve index.html at root
 @app.get("/")
 async def root():
-    with open("index.html") as f:
+    index_file = Path(__file__).resolve().parent.parent / "client" / "index.html"
+    with open(index_file) as f:
         return HTMLResponse(f.read())
 
 
