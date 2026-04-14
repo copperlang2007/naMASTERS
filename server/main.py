@@ -158,6 +158,7 @@ async def call_handler(agent_ws: WebSocket):
 
             # ── TASK 3: Silence watchdog ────────────────────────────────
             async def silence_watchdog():
+                nonlocal last_agent_spoke
                 SILENCE_THRESHOLD = 12
                 REENGAGEMENT = [
                     "The agent has been quiet for a moment. Fill the silence naturally as Dorothy — say something like 'Hello? Are you still there?' or 'I just want to make sure I understand...' Speak slowly.",
@@ -180,7 +181,6 @@ async def call_handler(agent_ws: WebSocket):
                         }))
                         await openai_ws.send(json.dumps({"type": "response.create"}))
                         # Reset so she doesn't spam
-                        nonlocal last_agent_spoke
                         last_agent_spoke = asyncio.get_event_loop().time()
 
             # ── RUN ALL THREE CONCURRENTLY — THIS IS THE KEY FIX ───────
