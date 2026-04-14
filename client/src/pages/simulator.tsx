@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
-import { PreCallScreen } from "@/components/pre-call-screen";
-import { ActiveCallScreen } from "@/components/active-call-screen";
-import { PostCallDebrief } from "@/components/post-call-debrief";
+import { PreCallScreen } from "@/components/simulator/pre-call-screen";
+import { ActiveCallScreen } from "@/components/simulator/active-call-screen";
+import { PostCallDebrief } from "@/components/simulator/post-call-debrief";
 import type { SimulatorState, TranscriptSegment, CallScore } from "@/lib/simulator-types";
 
 // ─────────────────────────────────────────────────────────────────────────────

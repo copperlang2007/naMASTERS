@@ -400,6 +400,15 @@ function setLive(live){
   document.getElementById('conn-status').textContent=live?'Connected':'Idle';
 }
 
+function escapeHtml(str){
+  return String(str)
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('\"','&quot;')
+    .replaceAll(\"'\",'&#39;');
+}
+
 function addEntry(speaker,text){
   const body=document.getElementById('t-body');
   const em=document.getElementById('empty-state');
@@ -419,7 +428,7 @@ function addEntry(speaker,text){
     </div>
     <div class="t-body-inner">
       <div class="t-speaker ${isDot?'d':'a'}">${isDot?'Dorothy Miller':'You (Agent)'}</div>
-      <div class="t-text">${text}</div>
+      <div class="t-text">${escapeHtml(text)}</div>
       <div class="t-time">${t}</div>
     </div>`;
   body.appendChild(el);
