@@ -133,7 +133,7 @@ async def score_call(transcript_list: list) -> dict:
             lines.append(f"{speaker}: {text}")
 
     transcript_text = "\n".join(lines) if lines else "(No transcript recorded)"
-    prompt = _SCORING_PROMPT.format(transcript=transcript_text)
+    prompt = _SCORING_PROMPT.replace("{transcript}", transcript_text)
 
     response = await client.chat.completions.create(
         model="gpt-4o",
