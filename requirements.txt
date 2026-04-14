@@ -1,0 +1,5 @@
+refastapi
+uvicorn
+websockets
+openai
+python-dotenv
