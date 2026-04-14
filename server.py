@@ -37,6 +37,12 @@ async def root():
         return HTMLResponse(f.read())
 
 
+@app.get("/sunfire-mock.html")
+async def sunfire_mock():
+    with open("sunfire-mock.html") as f:
+        return HTMLResponse(f.read())
+
+
 @app.post("/api/score")
 async def api_score(request: Request):
     body = await request.json()
@@ -52,6 +58,7 @@ async def api_score(request: Request):
         print(f"Scoring error: {exc}")
         return JSONResponse({"error": str(exc)}, status_code=500)
 
+    db_saved = True
     try:
         save_session(
             agent_name=agent_name,
@@ -63,8 +70,30 @@ async def api_score(request: Request):
         )
     except Exception as exc:
         print(f"DB save error: {exc}")
+        db_saved = False
 
-    return JSONResponse(score)
+    # Dorothy's ground truth — only revealed post-call
+    dorothy_profile = {
+        "name": "Dorothy Miller",
+        "dob": "September 4, 1952 (Age 72)",
+        "address": "847 Willow Creek Drive, Anna, TX 75409",
+        "phone": "(469) 555-0317",
+        "medicare_id": "2HJ7-RF4-NP61",
+        "current_plan": "UHC Medicare Advantage — Plan ID UHC-MA-TX-0047",
+        "doctors": "PCP: Dr. Robert Chen, North Texas Family Clinic, Anna TX\nCardiologist: Dr. Linda Okafor, Plano TX (seen once last year — all clear)",
+        "medications": "Lisinopril 10mg once daily (blood pressure)\nMetformin 500mg twice daily (diabetes) — ONLY these two",
+        "pharmacy": "CVS in Anna, TX (possibly Walgreens — she was vague)",
+        "reason_for_call": "Saw a ~$900 grocery benefit card online (Facebook or a website); wants to know if it is real and if her plan has it",
+        "priority_2_copays": "Metformin copay has felt more expensive lately — wants to lower it",
+        "priority_3_dental": "Has not been to the dentist in 2 years due to cost; wants to know if her plan covers dental",
+        "lis_status": "No — not enrolled in LIS / Extra Help"
+    }
+
+    return JSONResponse({
+        "score": score,
+        "dorothy_profile": dorothy_profile,
+        "db_saved": db_saved
+    })
 
 
 @app.websocket("/ws/call")
