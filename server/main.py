@@ -5,6 +5,7 @@ from pathlib import Path
 import websockets
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 import uvicorn
 from dotenv import load_dotenv
 from server.personas.dorothy import (
@@ -19,13 +20,23 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 app = FastAPI()
 
+dist_path = Path(__file__).resolve().parent.parent / "client" / "dist"
+
+# Serve static assets from Vite build
+if dist_path.exists():
+    app.mount("/assets", StaticFiles(directory=dist_path / "assets"), name="assets")
 
 @app.get("/")
 async def root():
-    index_file = Path(__file__).resolve().parent.parent / "client" / "index.html"
+    index_file = dist_path / "index.html"
     with open(index_file) as f:
         return HTMLResponse(f.read())
 
+@app.get("/{full_path:path}")
+async def catch_all(full_path: str):
+    index_file = dist_path / "index.html"
+    with open(index_file) as f:
+        return HTMLResponse(f.read())
 
 @app.websocket("/ws/call")
 async def call_handler(agent_ws: WebSocket):
@@ -43,13 +54,11 @@ async def call_handler(agent_ws: WebSocket):
     try:
         async with websockets.connect(OPENAI_WS_URL, additional_headers=HEADERS) as openai_ws:
 
-            # SETUP SESSION
             await openai_ws.send(json.dumps({
                 "type": "session.update",
                 "session": DOROTHY_SESSION_CONFIG
             }))
 
-            # TRIGGER OPENING LINE
             await openai_ws.send(json.dumps({
                 "type": "conversation.item.create",
                 "item": {
@@ -60,7 +69,6 @@ async def call_handler(agent_ws: WebSocket):
             }))
             await openai_ws.send(json.dumps({"type": "response.create"}))
 
-            # TASK 1: OpenAI to Agent browser
             async def receive_from_openai():
                 nonlocal turn_count
                 import base64
@@ -108,7 +116,6 @@ async def call_handler(agent_ws: WebSocket):
                                 "turn": turn_count
                             }))
 
-            # TASK 2: Agent browser to OpenAI
             async def receive_from_agent():
                 nonlocal last_agent_spoke
                 import base64
@@ -134,7 +141,6 @@ async def call_handler(agent_ws: WebSocket):
                 except WebSocketDisconnect:
                     await openai_ws.close()
 
-            # TASK 3: Silence watchdog
             async def silence_watchdog():
                 nonlocal last_agent_spoke
                 import random
@@ -160,7 +166,6 @@ async def call_handler(agent_ws: WebSocket):
                         await openai_ws.send(json.dumps({"type": "response.create"}))
                         last_agent_spoke = asyncio.get_event_loop().time()
 
-            # RUN ALL THREE CONCURRENTLY
             await asyncio.gather(
                 receive_from_openai(),
                 receive_from_agent(),
