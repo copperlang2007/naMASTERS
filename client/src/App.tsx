@@ -1,6 +1,6 @@
 import { Switch, Route } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import SimulatorPage from "@/pages/simulator";
+import SimulatorPage from "@/components/simulator/SimulatorPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
