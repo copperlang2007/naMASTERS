@@ -2,7 +2,6 @@ import asyncio
 import json
 import os
 from pathlib import Path
-from pathlib import Path
 import websockets
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
