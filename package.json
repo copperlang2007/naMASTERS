@@ -1,5 +1,8 @@
 {
   "name": "medicare-training-sim",
   "private": true,
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "scripts": {
+    "build": "cd client && npm install && npm run build"
+  }
 }
