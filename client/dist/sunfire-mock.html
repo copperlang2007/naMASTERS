@@ -1,0 +1,1669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SunFire BlazeConnect — Mock Training Tool</title>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── SUNFIRE DESIGN SYSTEM ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --sf-blue: #1a73c8;
+  --sf-blue-dark: #1558a0;
+  --sf-blue-light: #e8f0fb;
+  --sf-green: #2e7d32;
+  --sf-green-light: #e8f5e9;
+  --sf-orange: #e65100;
+  --sf-gray: #f5f5f5;
+  --sf-gray-mid: #e0e0e0;
+  --sf-gray-dark: #757575;
+  --sf-text: #212121;
+  --sf-text-light: #616161;
+  --sf-border: #ddd;
+  --sf-red: #c62828;
+  --sf-amber: #f57f17;
+  --sf-sidebar: #2c3e50;
+  --sf-sidebar-active: #1a73c8;
+  --sf-header: #fff;
+}
+body {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  color: var(--sf-text);
+  background: #f0f2f5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HEADER */
+.sf-header {
+  background: white;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--sf-border);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  position: sticky; top: 0; z-index: 100;
+}
+.sf-logo { display: flex; align-items: center; gap: 10px; }
+.sf-logo-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, #1a73c8, #0d47a1);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-weight: 800; font-size: 13px;
+  letter-spacing: -0.5px;
+}
+.sf-logo-text { font-size: 16px; font-weight: 700; color: var(--sf-text); }
+.sf-logo-text span { color: var(--sf-blue); }
+.sf-header-center {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--sf-text-light);
+}
+.sf-personal-code {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 12px;
+  border: 1px solid var(--sf-border);
+  border-radius: 4px;
+  background: var(--sf-gray);
+  font-size: 13px; font-weight: 600; color: var(--sf-text);
+  cursor: pointer;
+}
+.sf-avatar {
+  width: 32px; height: 32px;
+  background: var(--sf-blue);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-weight: 700; font-size: 13px;
+  cursor: pointer;
+}
+
+/* LAYOUT */
+.sf-app { display: flex; flex: 1; min-height: calc(100vh - 52px); }
+
+/* SIDEBAR */
+.sf-sidebar {
+  width: 56px;
+  background: var(--sf-sidebar);
+  display: flex; flex-direction: column; align-items: center;
+  padding: 12px 0;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.sf-nav-item {
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 8px;
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.sf-nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
+.sf-nav-item.active { background: var(--sf-blue); color: white; }
+.sf-nav-item svg { width: 20px; height: 20px; }
+
+/* MAIN */
+.sf-main { flex: 1; overflow-y: auto; }
+
+/* TRAINING BANNER */
+.training-banner {
+  background: linear-gradient(135deg, #1a237e, #1a73c8);
+  color: white;
+  padding: 8px 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex; align-items: center; gap: 8px;
+  letter-spacing: 0.3px;
+}
+.training-banner .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #ffeb3b;
+  box-shadow: 0 0 6px #ffeb3b;
+  animation: blink 1.5s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* PAGES */
+.page { display: none; padding: 24px 28px; max-width: 960px; }
+.page.active { display: block; }
+
+/* QUICK LINKS - DASHBOARD */
+.ql-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.ql-btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 14px;
+  background: white;
+  border: 1px solid var(--sf-border);
+  border-radius: 6px;
+  font-size: 14px; font-weight: 600; color: var(--sf-blue);
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.ql-btn:hover { background: var(--sf-blue-light); border-color: var(--sf-blue); }
+.ql-btn svg { width: 20px; height: 20px; }
+.ql-btn.highlight { background: var(--sf-blue); color: white; }
+.ql-btn.highlight:hover { background: var(--sf-blue-dark); }
+
+/* SECTION TITLE */
+.sf-section-title {
+  font-size: 20px; font-weight: 600;
+  color: var(--sf-text);
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--sf-border);
+}
+
+/* CARD */
+.sf-card {
+  background: white;
+  border: 1px solid var(--sf-border);
+  border-radius: 6px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.sf-card-title {
+  font-size: 15px; font-weight: 600;
+  color: var(--sf-text);
+  margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.sf-card-title svg { width: 18px; height: 18px; color: var(--sf-blue); }
+
+/* TABS */
+.sf-tabs { display: flex; border-bottom: 2px solid var(--sf-border); margin-bottom: 20px; }
+.sf-tab {
+  padding: 10px 20px;
+  font-size: 14px; font-weight: 500;
+  color: var(--sf-text-light);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+}
+.sf-tab.active { color: var(--sf-blue); border-bottom-color: var(--sf-blue); font-weight: 600; }
+.sf-tab:hover { color: var(--sf-blue); }
+
+/* INFO BOX */
+.sf-info-box {
+  background: #e3f2fd;
+  border-left: 4px solid var(--sf-blue);
+  padding: 12px 16px;
+  border-radius: 0 4px 4px 0;
+  margin-bottom: 20px;
+  font-size: 13px;
+  color: var(--sf-text);
+  display: flex; align-items: flex-start; gap: 8px;
+}
+.sf-info-box::before { content: '✓'; color: var(--sf-blue); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+
+/* FORM ELEMENTS */
+.sf-field { margin-bottom: 16px; }
+.sf-label { font-size: 13px; font-weight: 600; color: var(--sf-text); margin-bottom: 5px; display: block; }
+.sf-label .req { color: var(--sf-red); margin-left: 2px; }
+.sf-input {
+  width: 100%; padding: 8px 12px;
+  border: 1px solid var(--sf-border);
+  border-radius: 4px;
+  font-size: 14px; font-family: inherit;
+  color: var(--sf-text);
+  transition: border 0.2s;
+  outline: none;
+}
+.sf-input:focus { border-color: var(--sf-blue); box-shadow: 0 0 0 2px rgba(26,115,200,0.1); }
+.sf-input.prefilled { background: #fff8e1; border-color: #fbc02d; }
+.sf-input-date {
+  display: flex; gap: 6px; align-items: center;
+}
+.sf-input-date input { width: 60px; text-align: center; padding: 8px 6px; }
+.sf-input-date span { color: var(--sf-text-light); }
+.sf-input-date input.year { width: 80px; }
+
+.sf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.sf-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+.sf-btn {
+  padding: 9px 22px;
+  border-radius: 4px;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer; border: none;
+  font-family: inherit; transition: all 0.2s;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.sf-btn-primary { background: var(--sf-blue); color: white; }
+.sf-btn-primary:hover { background: var(--sf-blue-dark); }
+.sf-btn-secondary { background: white; color: var(--sf-blue); border: 1px solid var(--sf-blue); }
+.sf-btn-secondary:hover { background: var(--sf-blue-light); }
+.sf-btn-green { background: #388e3c; color: white; }
+.sf-btn-green:hover { background: #2e7d32; }
+.sf-btn-sm { padding: 5px 14px; font-size: 12px; }
+.sf-btn-link { background: none; color: var(--sf-blue); border: none; padding: 0; font-size: 13px; cursor: pointer; text-decoration: underline; }
+
+/* RADIO / CHECKBOX */
+.sf-radio-group, .sf-check-group { display: flex; gap: 8px; flex-wrap: wrap; }
+.sf-radio-btn {
+  padding: 7px 16px;
+  border: 1px solid var(--sf-border);
+  border-radius: 4px;
+  cursor: pointer; font-size: 13px;
+  background: white; color: var(--sf-text);
+  transition: all 0.2s;
+}
+.sf-radio-btn.selected { background: var(--sf-blue); color: white; border-color: var(--sf-blue); }
+.sf-radio-btn:hover:not(.selected) { border-color: var(--sf-blue); color: var(--sf-blue); }
+
+.sf-checkbox-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.sf-check-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 0;
+  font-size: 13px; cursor: pointer;
+}
+.sf-check-item input[type=checkbox] { width: 15px; height: 15px; cursor: pointer; accent-color: var(--sf-blue); }
+
+/* DOCTOR SEARCH */
+.sf-search-wrap { position: relative; }
+.sf-search-row { display: flex; gap: 10px; align-items: flex-end; }
+.sf-search-row .sf-field { flex: 1; margin-bottom: 0; }
+.sf-radius-select { width: 130px; }
+.sf-dropdown {
+  position: absolute; top: 100%; left: 0; right: 0;
+  background: white; border: 1px solid var(--sf-border);
+  border-top: none; border-radius: 0 0 4px 4px;
+  max-height: 200px; overflow-y: auto;
+  z-index: 50;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.sf-dropdown-item {
+  padding: 10px 14px;
+  cursor: pointer; font-size: 13px;
+  border-bottom: 1px solid #f5f5f5;
+  transition: background 0.1s;
+}
+.sf-dropdown-item:hover { background: var(--sf-blue-light); }
+.sf-dropdown-item strong { color: var(--sf-blue); }
+.sf-doctor-tag {
+  background: white;
+  border: 1px solid var(--sf-border);
+  border-radius: 4px;
+  padding: 10px 14px;
+  margin-top: 10px;
+  display: flex; justify-content: space-between; align-items: flex-start;
+}
+.sf-doctor-tag-name { font-weight: 600; font-size: 13px; }
+.sf-doctor-tag-role { font-size: 12px; color: var(--sf-blue); font-weight: 600; }
+.sf-doctor-tag-addr { font-size: 12px; color: var(--sf-text-light); margin-top: 2px; }
+.sf-doctor-more { font-size: 12px; color: var(--sf-blue); cursor: pointer; }
+
+/* MED TAG */
+.sf-med-tag {
+  background: white; border: 1px solid var(--sf-border);
+  border-radius: 4px; padding: 10px 14px;
+  margin-top: 8px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.sf-med-name { font-weight: 600; font-size: 13px; }
+.sf-med-refill { font-size: 12px; color: var(--sf-text-light); }
+.sf-med-actions { display: flex; gap: 8px; }
+
+/* PLAN LIST */
+.sf-plan-context {
+  background: white; border: 1px solid var(--sf-border);
+  border-radius: 6px 6px 0 0;
+  padding: 10px 16px;
+  display: flex; align-items: center; gap: 16px;
+  font-size: 12px; color: var(--sf-text-light);
+  border-bottom: 1px solid var(--sf-border);
+  flex-wrap: wrap; gap: 12px;
+}
+.sf-plan-context-item { display: flex; align-items: center; gap: 4px; }
+.sf-plan-context-item svg { width: 14px; height: 14px; }
+
+.sf-plan-toolbar {
+  background: white; border: 1px solid var(--sf-border);
+  border-top: none;
+  padding: 10px 16px;
+  display: flex; align-items: center; gap: 12px;
+  border-bottom: 2px solid var(--sf-border);
+}
+.sf-view-toggle { display: flex; border: 1px solid var(--sf-border); border-radius: 4px; overflow: hidden; }
+.sf-view-btn {
+  padding: 6px 12px; font-size: 12px; font-weight: 600;
+  cursor: pointer; background: white; color: var(--sf-text-light);
+  border: none; display: flex; align-items: center; gap: 5px;
+  transition: all 0.2s;
+}
+.sf-view-btn.active { background: var(--sf-blue); color: white; }
+
+.sf-sort-wrap { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+.sf-sort-wrap select { padding: 5px 8px; border: 1px solid var(--sf-border); border-radius: 4px; font-size: 12px; font-family: inherit; }
+
+.sf-plan-layout { display: flex; gap: 0; }
+
+/* FILTERS */
+.sf-filters {
+  width: 200px; flex-shrink: 0;
+  background: white; border: 1px solid var(--sf-border);
+  border-top: none; border-right: none;
+  padding: 14px;
+}
+.sf-filter-section { margin-bottom: 16px; }
+.sf-filter-title { font-size: 12px; font-weight: 700; color: var(--sf-text); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.3px; }
+.sf-filter-item { display: flex; align-items: center; gap: 7px; padding: 4px 0; font-size: 13px; cursor: pointer; }
+.sf-filter-item input { accent-color: var(--sf-blue); }
+.sf-filter-item label { cursor: pointer; }
+.sf-filter-radio { display: flex; align-items: center; gap: 7px; padding: 4px 0; font-size: 13px; cursor: pointer; }
+.sf-filter-radio input { accent-color: var(--sf-blue); }
+
+/* PLAN CARDS */
+.sf-plans-list {
+  flex: 1;
+  background: #f8f9fa;
+  border: 1px solid var(--sf-border);
+  border-top: none; border-left: none;
+}
+.sf-plan-header-row {
+  display: grid;
+  grid-template-columns: 1fr 110px 110px 80px 80px 80px 80px;
+  gap: 8px;
+  padding: 8px 16px;
+  background: white;
+  border-bottom: 1px solid var(--sf-border);
+  font-size: 11px; font-weight: 700;
+  color: var(--sf-text-light);
+  text-transform: uppercase; letter-spacing: 0.3px;
+}
+
+.sf-plan-card {
+  background: white;
+  border-bottom: 1px solid var(--sf-border);
+  transition: box-shadow 0.2s;
+}
+.sf-plan-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.sf-plan-card.current-plan { border-left: 4px solid var(--sf-amber); }
+.sf-plan-card.recommended { border-left: 4px solid var(--sf-green); }
+
+.sf-plan-card-top {
+  display: grid;
+  grid-template-columns: 1fr 110px 110px 80px 80px 80px 80px;
+  gap: 8px;
+  padding: 12px 16px;
+  align-items: start;
+}
+.sf-plan-name-section {}
+.sf-plan-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 600; color: var(--sf-amber);
+  margin-bottom: 4px;
+}
+.sf-plan-badge svg { width: 12px; height: 12px; }
+.sf-plan-name { font-size: 14px; font-weight: 600; color: var(--sf-blue); cursor: pointer; }
+.sf-plan-name:hover { text-decoration: underline; }
+.sf-plan-carrier { font-size: 12px; color: var(--sf-text-light); margin-top: 1px; }
+.sf-plan-id { font-size: 11px; color: var(--sf-text-light); }
+.sf-stars { color: #f59e0b; font-size: 12px; margin-top: 2px; }
+.sf-stars span { color: var(--sf-text-light); font-size: 11px; }
+
+.sf-plan-col { display: flex; flex-direction: column; align-items: flex-end; }
+.sf-plan-premium { font-size: 20px; font-weight: 700; color: var(--sf-text); }
+.sf-plan-premium-label { font-size: 10px; color: var(--sf-text-light); }
+.sf-plan-est { font-size: 14px; font-weight: 600; color: var(--sf-text); }
+.sf-plan-small { font-size: 12px; color: var(--sf-text-light); text-align: right; }
+.sf-plan-yes { font-size: 13px; font-weight: 600; color: var(--sf-green); }
+.sf-plan-no { font-size: 13px; color: var(--sf-text-light); }
+.sf-plan-amt { font-size: 13px; font-weight: 600; color: var(--sf-text); }
+
+.sf-plan-details {
+  padding: 0 16px 12px;
+  border-top: 1px solid #f0f0f0;
+  margin-top: 0;
+}
+.sf-plan-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  padding: 12px 0;
+}
+.sf-detail-group {}
+.sf-detail-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; color: var(--sf-text-light); margin-bottom: 4px; }
+.sf-detail-val { font-size: 13px; color: var(--sf-text); }
+
+.sf-benefits-row {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  margin: 6px 0;
+}
+.sf-benefit-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 9px;
+  border-radius: 100px;
+  font-size: 11px; font-weight: 600;
+  background: #e8f5e9; color: #2e7d32;
+  border: 1px solid rgba(46,125,50,0.2);
+}
+.sf-benefit-chip svg { width: 11px; height: 11px; }
+.sf-benefit-chip.otc { background: #e3f2fd; color: #1565c0; border-color: rgba(21,101,192,0.2); }
+.sf-benefit-chip.grocery { background: #fff3e0; color: #e65100; border-color: rgba(230,81,0,0.2); }
+.sf-benefit-chip.transport { background: #f3e5f5; color: #6a1b9a; border-color: rgba(106,27,154,0.2); }
+
+.sf-pharmacy-row { display: flex; align-items: center; gap: 8px; margin: 4px 0; font-size: 13px; }
+.sf-pharmacy-name { font-weight: 600; }
+.sf-pharmacy-tier { background: var(--sf-gray); padding: 1px 8px; border-radius: 3px; font-size: 11px; color: var(--sf-text-light); }
+
+.sf-drug-cost { font-size: 13px; }
+.sf-drug-cost .zero { color: var(--sf-green); font-weight: 700; font-size: 14px; }
+.sf-drug-note { font-size: 11px; color: var(--sf-green); margin-top: 2px; }
+
+.sf-plan-actions {
+  padding: 8px 16px;
+  background: #fafafa;
+  border-top: 1px solid #f0f0f0;
+  display: flex; align-items: center; gap: 10px;
+}
+.sf-compare-check { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; }
+.sf-compare-check input { accent-color: var(--sf-blue); width: 14px; height: 14px; }
+
+/* COMPARE BAR */
+.sf-compare-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--sf-blue-dark);
+  color: white;
+  padding: 12px 20px;
+  display: none;
+  align-items: center; gap: 12px;
+  z-index: 200;
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.2);
+}
+.sf-compare-bar.show { display: flex; }
+.sf-compare-slot {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 4px;
+  padding: 6px 14px;
+  font-size: 13px;
+  display: flex; align-items: center; gap: 8px;
+  min-width: 180px;
+}
+.sf-compare-slot.empty { opacity: 0.5; border-style: dashed; }
+.sf-compare-slot .x { cursor: pointer; opacity: 0.7; }
+.sf-compare-slot .x:hover { opacity: 1; }
+.sf-compare-label { font-size: 12px; opacity: 0.8; margin-right: 4px; }
+
+/* ENROLLMENT */
+.sf-medicare-card {
+  background: linear-gradient(135deg, #1565c0, #0d47a1);
+  border-radius: 8px;
+  padding: 16px 20px;
+  color: white;
+  max-width: 320px;
+  margin-bottom: 20px;
+}
+.sf-medicare-card .mc-title { font-size: 11px; font-weight: 700; letter-spacing: 1px; margin-bottom: 8px; opacity: 0.9; }
+.sf-medicare-card .mc-name { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+.sf-medicare-card .mc-label { font-size: 10px; opacity: 0.7; }
+.sf-medicare-card .mc-number { font-size: 15px; font-weight: 600; letter-spacing: 1px; margin-bottom: 10px; }
+.sf-medicare-card .mc-row { display: flex; gap: 20px; margin-top: 6px; }
+.sf-medicare-card .mc-part { }
+.sf-medicare-card .mc-part-label { font-size: 10px; font-weight: 700; opacity: 0.8; }
+.sf-medicare-card .mc-part-name { font-size: 11px; }
+.sf-medicare-card .mc-part-date { font-size: 11px; font-weight: 600; }
+.sf-medicare-card .mc-red { height: 8px; background: linear-gradient(90deg, #c62828, #ef5350); border-radius: 0 0 8px 8px; margin: 12px -20px -16px; }
+
+/* NOTICE */
+.sf-notice {
+  padding: 10px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+  margin-bottom: 12px;
+  display: flex; align-items: flex-start; gap: 8px;
+}
+.sf-notice.warning { background: #fff3e0; border: 1px solid #ffcc02; color: #e65100; }
+.sf-notice.info { background: #e3f2fd; border: 1px solid #90caf9; color: #1565c0; }
+.sf-notice.success { background: var(--sf-green-light); border: 1px solid #a5d6a7; color: var(--sf-green); }
+
+/* STEP INDICATOR */
+.sf-steps {
+  display: flex; align-items: center; gap: 0;
+  margin-bottom: 24px; overflow: hidden;
+}
+.sf-step {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 16px;
+  font-size: 12px; font-weight: 600;
+  color: var(--sf-text-light);
+  background: white; border: 1px solid var(--sf-border);
+  flex: 1; cursor: pointer;
+  border-right: none; position: relative;
+  transition: all 0.2s;
+}
+.sf-step:last-child { border-right: 1px solid var(--sf-border); }
+.sf-step.done { background: var(--sf-green-light); color: var(--sf-green); border-color: #a5d6a7; }
+.sf-step.active { background: var(--sf-blue); color: white; border-color: var(--sf-blue); }
+.sf-step-num {
+  width: 20px; height: 20px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+  background: rgba(0,0,0,0.1); flex-shrink: 0;
+}
+.sf-step.active .sf-step-num { background: rgba(255,255,255,0.3); }
+.sf-step.done .sf-step-num { background: var(--sf-green); color: white; }
+
+/* MISC */
+.sf-divider { height: 1px; background: var(--sf-border); margin: 16px 0; }
+.sf-text-muted { color: var(--sf-text-light); font-size: 12px; }
+.sf-plan-count { font-size: 22px; font-weight: 700; color: var(--sf-text); }
+.sf-plan-count span { font-size: 14px; font-weight: 400; color: var(--sf-text-light); margin-left: 4px; }
+.sf-select { padding: 7px 10px; border: 1px solid var(--sf-border); border-radius: 4px; font-size: 13px; font-family: inherit; color: var(--sf-text); }
+
+.sf-success-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--sf-green-light); color: var(--sf-green);
+  border: 1px solid #a5d6a7;
+  padding: 6px 14px; border-radius: 100px;
+  font-size: 13px; font-weight: 600;
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="sf-header">
+  <div class="sf-logo">
+    <div class="sf-logo-icon">SF</div>
+    <div class="sf-logo-text">SunFire <span>BlazeConnect</span></div>
+  </div>
+  <div class="sf-personal-code">
+    Personal Code: JKB07XP9
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+  </div>
+  <div class="sf-avatar">M</div>
+</header>
+
+<div class="training-banner">
+  <div class="dot"></div>
+  TRAINING MODE — Mock Sunfire for Dorothy Miller (DOB 09/04/1952 · ZIP 75409 · Medicare ID: 2HJ7-RF4-NP61)
+</div>
+
+<div class="sf-app">
+
+  <!-- SIDEBAR -->
+  <aside class="sf-sidebar">
+    <div class="sf-nav-item active" onclick="goPage('dashboard')" title="Dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+    </div>
+    <div class="sf-nav-item" onclick="goPage('profile')" title="Quote & Enroll">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+    </div>
+    <div class="sf-nav-item" onclick="goPage('plans')" title="Plans">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    </div>
+    <div class="sf-nav-item" title="Scope">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    </div>
+    <div class="sf-nav-item" title="Analytics">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    </div>
+    <div class="sf-nav-item" title="Settings" style="margin-top:auto;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+    </div>
+    <div class="sf-nav-item" title="Help">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="sf-main">
+
+    <!-- PAGE: DASHBOARD -->
+    <div class="page active" id="page-dashboard" style="padding:24px 28px;">
+      <div class="ql-bar">
+        <div class="ql-btn" onclick="goPage('profile')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="20" height="20"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          Search contacts
+        </div>
+        <div class="ql-btn highlight" onclick="goPage('profile')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="20" height="20"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          Quote & Enroll
+        </div>
+        <div class="ql-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="20" height="20"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          Send a scope
+        </div>
+        <div class="ql-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="20" height="20"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Reporting
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;">
+        <div class="sf-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <div style="font-weight:600;font-size:15px;">Contacts for last 30 days</div>
+            <div style="display:flex;gap:12px;">
+              <span style="font-size:13px;color:var(--sf-blue);cursor:pointer;">View all for last 30 days</span>
+              <span style="font-size:13px;color:var(--sf-blue);cursor:pointer;">View older contacts</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap;">
+            <span style="font-size:12px;color:var(--sf-text-light);">Last name starts with:</span>
+            <span style="font-size:12px;color:var(--sf-blue);cursor:pointer;font-weight:500;" onclick="goPage('profile')">M</span>
+            <span style="font-size:12px;color:var(--sf-text-light);">·</span>
+            <span style="font-size:12px;color:var(--sf-blue);cursor:pointer;font-weight:500;">A B C D E F G H I J K L N O P Q R S T U V W X Y Z</span>
+          </div>
+          <table style="width:100%;border-collapse:collapse;">
+            <thead>
+              <tr style="background:#f5f5f5;">
+                <th style="padding:8px 10px;text-align:left;font-size:12px;font-weight:600;color:var(--sf-text-light);border-bottom:1px solid var(--sf-border);">First name</th>
+                <th style="padding:8px 10px;text-align:left;font-size:12px;font-weight:600;color:var(--sf-text-light);border-bottom:1px solid var(--sf-border);">Last name</th>
+                <th style="padding:8px 10px;text-align:left;font-size:12px;font-weight:600;color:var(--sf-text-light);border-bottom:1px solid var(--sf-border);">Disposition</th>
+                <th style="padding:8px 10px;text-align:left;font-size:12px;font-weight:600;color:var(--sf-text-light);border-bottom:1px solid var(--sf-border);">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid #f5f5f5;" class="hover-row">
+                <td style="padding:9px 10px;font-size:13px;">Dorothy</td>
+                <td style="padding:9px 10px;font-size:13px;font-weight:600;color:var(--sf-blue);cursor:pointer;" onclick="goPage('profile')">Miller</td>
+                <td style="padding:9px 10px;font-size:13px;">Active Call</td>
+                <td style="padding:9px 10px;"><button class="sf-btn sf-btn-primary sf-btn-sm" onclick="goPage('profile')">Quote & Enroll</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <div class="sf-card" style="margin-bottom:12px;">
+            <div style="font-weight:600;font-size:15px;margin-bottom:12px;">Enrollments for the last 30 days</div>
+            <div style="display:flex;gap:16px;">
+              <div style="display:flex;align-items:center;gap:6px;font-size:13px;"><span style="color:#2e7d32;font-size:18px;">✓</span><span style="color:#2e7d32;font-weight:600;">0 Successful</span></div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:13px;"><span style="color:#c62828;font-size:18px;">✗</span><span style="color:#c62828;font-weight:600;">0 Incomplete</span></div>
+            </div>
+          </div>
+          <div class="sf-card" style="margin-bottom:12px;">
+            <div style="font-weight:600;font-size:15px;margin-bottom:8px;">Resources</div>
+            <div style="font-size:13px;color:var(--sf-text-light);">Quick links to training materials and plan guides.</div>
+          </div>
+          <div class="sf-card">
+            <div style="font-weight:600;font-size:15px;margin-bottom:8px;">Messages</div>
+            <div style="font-size:13px;color:var(--sf-text-light);">No new messages.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: CUSTOMER PROFILE -->
+    <div class="page" id="page-profile" style="padding:24px 28px;max-width:700px;">
+      <div class="sf-section-title">Customer Profile</div>
+
+      <div class="sf-tabs">
+        <div class="sf-tab active">Customer lookup</div>
+        <div class="sf-tab">Zip code</div>
+      </div>
+
+      <div class="sf-info-box">
+        To get started I would like to get your Zip code, Medicare Number &amp; DOB.<br>
+        I will use this information to look up your current situation &amp; any medication information to provide the best recommendations.
+      </div>
+
+      <div class="sf-card">
+        <div class="sf-row">
+          <div class="sf-field">
+            <label class="sf-label">ZIP code<span class="req">*</span></label>
+            <input type="text" class="sf-input prefilled" value="75409" id="zip-input">
+          </div>
+          <div class="sf-field">
+            <label class="sf-label">Medicare number<span class="req">*</span></label>
+            <input type="text" class="sf-input prefilled" value="2HJ7-RF4-NP61" id="medicare-input">
+          </div>
+        </div>
+        <div class="sf-field">
+          <label class="sf-label">Date of birth<span class="req">*</span></label>
+          <div class="sf-input-date">
+            <input type="text" class="sf-input prefilled" value="09" style="width:55px;text-align:center;">
+            <span>/</span>
+            <input type="text" class="sf-input prefilled" value="04" style="width:55px;text-align:center;">
+            <span>/</span>
+            <input type="text" class="sf-input prefilled year" value="1952" style="width:75px;text-align:center;">
+          </div>
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:var(--sf-text-light);">* Fields pre-filled from Dorothy Miller's profile</div>
+        <div style="margin-top:16px;">
+          <button class="sf-btn sf-btn-primary" onclick="goPage('doctors')">Lookup</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: DOCTORS -->
+    <div class="page" id="page-doctors" style="padding:24px 28px;max-width:800px;">
+
+      <div class="sf-steps">
+        <div class="sf-step done" onclick="goPage('profile')"><div class="sf-step-num">✓</div>Customer Profile</div>
+        <div class="sf-step active"><div class="sf-step-num">2</div>Doctors &amp; Plan usage</div>
+        <div class="sf-step" onclick="goPage('meds')"><div class="sf-step-num">3</div>Pharmacy &amp; Medications</div>
+        <div class="sf-step" onclick="goPage('focus')"><div class="sf-step-num">4</div>Focus Questions</div>
+        <div class="sf-step" onclick="goPage('plans')"><div class="sf-step-num">5</div>View Plans</div>
+      </div>
+
+      <div class="sf-card">
+        <div class="sf-card-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          Doctors &amp; Plan usage
+        </div>
+
+        <p style="font-size:13px;margin-bottom:14px;">Do you have a Primary Care Physician you want to continue seeing?</p>
+
+        <div class="sf-search-wrap">
+          <div class="sf-search-row">
+            <div class="sf-field">
+              <label class="sf-label">Search by your doctors last name</label>
+              <input type="text" class="sf-input" id="doctor-search" placeholder="e.g. Chen" oninput="filterDoctors(this.value)">
+            </div>
+            <div>
+              <label class="sf-label">Radius</label>
+              <select class="sf-input sf-radius-select">
+                <option>25 miles</option>
+                <option>10 miles</option>
+                <option>50 miles</option>
+              </select>
+            </div>
+          </div>
+          <div class="sf-dropdown" id="doctor-dropdown" style="display:none;">
+            <div class="sf-dropdown-item" onclick="selectDoctor('CHEN, ROBERT', 'North Texas Family Clinic, 801 W White St, Anna TX 75409')">
+              <strong>CHEN</strong>, ROBERT (NORTH TEXAS FAMILY CLINIC)
+            </div>
+            <div class="sf-dropdown-item" onclick="selectDoctor('CHEN, LINDA', 'Collin County Medical Group, 5680 Frisco Square Blvd, Frisco TX 75034')">
+              <strong>CHEN</strong>, LINDA (COLLIN COUNTY MEDICAL GROUP)
+            </div>
+            <div class="sf-dropdown-item" onclick="selectDoctor('CHEN, MICHAEL', 'McKinney Internal Medicine, 4600 Medical Center Dr, McKinney TX 75069')">
+              <strong>CHEN</strong>, MICHAEL (MCKINNEY INTERNAL MEDICINE)
+            </div>
+          </div>
+        </div>
+
+        <div id="doctor-list">
+          <div class="sf-doctor-tag">
+            <div>
+              <div class="sf-doctor-tag-name">CHEN, ROBERT <span class="sf-doctor-tag-role">Primary doctor</span></div>
+              <div class="sf-doctor-tag-addr">801 W White St, Anna, TX 75409 · <span class="sf-doctor-more">See 3 more locations</span></div>
+            </div>
+            <button class="sf-btn-link" style="color:var(--sf-red);font-size:12px;">Delete</button>
+          </div>
+        </div>
+
+        <div style="margin-top:8px;">
+          <p style="font-size:13px;color:var(--sf-text-light);margin-bottom:10px;">Do you want to add another doctor or specialist?</p>
+        </div>
+
+        <div class="sf-divider"></div>
+
+        <div style="background:#f9f9f9;border:1px solid var(--sf-border);border-radius:4px;padding:14px;">
+          <div style="font-weight:600;font-size:13px;margin-bottom:6px;">Plan Usage</div>
+          <div style="font-size:12px;color:var(--sf-text-light);margin-bottom:10px;">
+            <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;">
+              <input type="checkbox" style="margin-top:2px;accent-color:var(--sf-blue);">
+              <span>The next question helps me estimate cost, and won't affect your plan's premium. This gives me a better picture of how much a plan could cost you, but you don't need to answer if you aren't comfortable.</span>
+            </label>
+          </div>
+          <p style="font-size:13px;font-weight:500;margin-bottom:8px;">How frequently do you see a doctor or use your medical benefits?</p>
+          <div class="sf-radio-group" id="usage-group">
+            <div class="sf-radio-btn" onclick="selectRadio('usage', this)">Rarely</div>
+            <div class="sf-radio-btn" onclick="selectRadio('usage', this)">Occasionally</div>
+            <div class="sf-radio-btn selected" onclick="selectRadio('usage', this)">Frequently</div>
+            <div class="sf-radio-btn" onclick="selectRadio('usage', this)">Unknown</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;">
+        <button class="sf-btn sf-btn-secondary" onclick="goPage('profile')">← Back</button>
+        <button class="sf-btn sf-btn-primary" onclick="goPage('meds')">Continue →</button>
+      </div>
+    </div>
+
+    <!-- PAGE: MEDS -->
+    <div class="page" id="page-meds" style="padding:24px 28px;max-width:800px;">
+
+      <div class="sf-steps">
+        <div class="sf-step done" onclick="goPage('profile')"><div class="sf-step-num">✓</div>Customer Profile</div>
+        <div class="sf-step done" onclick="goPage('doctors')"><div class="sf-step-num">✓</div>Doctors &amp; Plan usage</div>
+        <div class="sf-step active"><div class="sf-step-num">3</div>Pharmacy &amp; Medications</div>
+        <div class="sf-step" onclick="goPage('focus')"><div class="sf-step-num">4</div>Focus Questions</div>
+        <div class="sf-step" onclick="goPage('plans')"><div class="sf-step-num">5</div>View Plans</div>
+      </div>
+
+      <div class="sf-card">
+        <div class="sf-card-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="18" height="18"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+          Pharmacy &amp; Medications
+        </div>
+
+        <div class="sf-field">
+          <label class="sf-label">Medication name</label>
+          <input type="text" class="sf-input" placeholder="Type medication name..." id="med-search">
+        </div>
+
+        <div id="med-list">
+          <div class="sf-med-tag">
+            <div>
+              <div class="sf-med-name">Lisinopril TAB 10MG</div>
+              <div class="sf-med-refill">Refill every month (30)</div>
+            </div>
+            <div class="sf-med-actions">
+              <button class="sf-btn sf-btn-secondary sf-btn-sm">Edit</button>
+              <button class="sf-btn-link" style="color:var(--sf-red);font-size:12px;">Delete</button>
+            </div>
+          </div>
+          <div class="sf-med-tag">
+            <div>
+              <div class="sf-med-name">Metformin TAB 500MG</div>
+              <div class="sf-med-refill">Refill every month (60) — twice daily</div>
+            </div>
+            <div class="sf-med-actions">
+              <button class="sf-btn sf-btn-secondary sf-btn-sm">Edit</button>
+              <button class="sf-btn-link" style="color:var(--sf-red);font-size:12px;">Delete</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="sf-divider"></div>
+
+        <div style="margin-bottom:14px;">
+          <p style="font-size:13px;font-weight:500;margin-bottom:8px;">Is there a pharmacy you use to fill prescriptions?</p>
+          <div class="sf-radio-group" id="pharm-group">
+            <div class="sf-radio-btn selected" onclick="selectRadio('pharm', this)">Yes</div>
+            <div class="sf-radio-btn" onclick="selectRadio('pharm', this)">No</div>
+            <div class="sf-radio-btn" onclick="selectRadio('pharm', this)">Mail order</div>
+          </div>
+          <div style="margin-top:10px;font-size:13px;color:var(--sf-text-light);">
+            Preferred pharmacy: <strong>CVS Pharmacy — Anna, TX 75409</strong>
+          </div>
+        </div>
+
+        <div>
+          <p style="font-size:13px;font-weight:500;margin-bottom:8px;">Do you receive Extra Help / Low Income Subsidy (optional)?</p>
+          <div class="sf-radio-group" id="lis-group">
+            <div class="sf-radio-btn" onclick="selectRadio('lis', this)">Yes</div>
+            <div class="sf-radio-btn selected" onclick="selectRadio('lis', this)">No</div>
+            <div class="sf-radio-btn" onclick="selectRadio('lis', this)">I don't know</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;">
+        <button class="sf-btn sf-btn-secondary" onclick="goPage('doctors')">← Back</button>
+        <button class="sf-btn sf-btn-primary" onclick="goPage('focus')">Continue →</button>
+      </div>
+    </div>
+
+    <!-- PAGE: FOCUS QUESTIONS -->
+    <div class="page" id="page-focus" style="padding:24px 28px;max-width:800px;">
+
+      <div class="sf-steps">
+        <div class="sf-step done" onclick="goPage('profile')"><div class="sf-step-num">✓</div>Customer Profile</div>
+        <div class="sf-step done" onclick="goPage('doctors')"><div class="sf-step-num">✓</div>Doctors &amp; Plan usage</div>
+        <div class="sf-step done" onclick="goPage('meds')"><div class="sf-step-num">✓</div>Pharmacy &amp; Medications</div>
+        <div class="sf-step active"><div class="sf-step-num">4</div>Focus Questions</div>
+        <div class="sf-step" onclick="goPage('plans')"><div class="sf-step-num">5</div>View Plans</div>
+      </div>
+
+      <div class="sf-card">
+        <div class="sf-card-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="18" height="18"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Focus Questions
+        </div>
+
+        <p style="font-size:13px;font-weight:500;margin-bottom:12px;">What plan benefits are most important? (choose 3)</p>
+
+        <div class="sf-checkbox-grid" id="focus-checks">
+          <label class="sf-check-item"><input type="checkbox" onchange="updateFocus()"> Flexibility to see any provider</label>
+          <label class="sf-check-item"><input type="checkbox" onchange="updateFocus()"> Keep current doctor(s)</label>
+          <label class="sf-check-item"><input type="checkbox" onchange="updateFocus()"> Frequent traveler</label>
+          <label class="sf-check-item"><input type="checkbox" checked onchange="updateFocus()"> Dental coverage</label>
+          <label class="sf-check-item"><input type="checkbox" onchange="updateFocus()"> Vision coverage</label>
+          <label class="sf-check-item"><input type="checkbox" onchange="updateFocus()"> Hearing coverage</label>
+          <label class="sf-check-item"><input type="checkbox" onchange="updateFocus()"> Insulin savings</label>
+          <label class="sf-check-item"><input type="checkbox" checked onchange="updateFocus()"> Over-the-counter coverage (OTC)</label>
+          <label class="sf-check-item"><input type="checkbox" onchange="updateFocus()"> Transportation</label>
+          <label class="sf-check-item"><input type="checkbox" checked onchange="updateFocus()"> Grocery / food benefit card</label>
+        </div>
+
+        <div style="margin-top:12px;padding:10px;background:var(--sf-green-light);border:1px solid #a5d6a7;border-radius:4px;font-size:12px;color:var(--sf-green);">
+          ✓ Priority benefits selected: Dental, OTC, Grocery/Food Card — results will be filtered accordingly
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;">
+        <button class="sf-btn sf-btn-secondary" onclick="goPage('meds')">← Back</button>
+        <button class="sf-btn sf-btn-primary" onclick="goPage('plans')">View all plans →</button>
+      </div>
+    </div>
+
+    <!-- PAGE: PLANS -->
+    <div class="page" id="page-plans" style="padding:0;max-width:100%;">
+
+      <div style="padding:16px 20px 0;">
+        <div class="sf-steps" style="margin-bottom:12px;">
+          <div class="sf-step done" onclick="goPage('profile')"><div class="sf-step-num">✓</div>Customer Profile</div>
+          <div class="sf-step done" onclick="goPage('doctors')"><div class="sf-step-num">✓</div>Doctors &amp; Plan usage</div>
+          <div class="sf-step done" onclick="goPage('meds')"><div class="sf-step-num">✓</div>Pharmacy &amp; Medications</div>
+          <div class="sf-step done" onclick="goPage('focus')"><div class="sf-step-num">✓</div>Focus Questions</div>
+          <div class="sf-step active"><div class="sf-step-num">5</div>View Plans</div>
+        </div>
+      </div>
+
+      <!-- Context bar -->
+      <div class="sf-plan-context" style="margin:0 20px;border-radius:6px 6px 0 0;">
+        <div style="font-size:16px;font-weight:700;">PLANS FOR <span style="color:var(--sf-blue);">75409</span> <span style="font-size:13px;font-weight:400;color:var(--sf-text-light);">(12 results shown)</span></div>
+        <div style="flex:1;"></div>
+        <div class="sf-plan-context-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Current plan: UHC-MA-TX-0047</div>
+        <div class="sf-plan-context-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg> CVS Pharmacy, Anna TX</div>
+        <div class="sf-plan-context-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg> 2 medication(s)</div>
+        <div class="sf-plan-context-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> 1 doctor (Dr. Robert Chen)</div>
+        <div class="sf-plan-context-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Frequent usage</div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="sf-plan-toolbar" style="margin:0 20px;">
+        <div class="sf-view-toggle">
+          <button class="sf-view-btn active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            List
+          </button>
+          <button class="sf-view-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            X-ray
+          </button>
+        </div>
+        <div class="sf-sort-wrap">
+          Sort:
+          <select>
+            <option>Recommended plans</option>
+            <option>Lowest premium</option>
+            <option>Lowest est. annual cost</option>
+            <option>Star rating</option>
+          </select>
+        </div>
+        <div class="sf-sort-wrap">
+          Time period:
+          <select><option>Annual</option><option>Monthly</option></select>
+        </div>
+      </div>
+
+      <div class="sf-plan-layout" style="margin:0 20px 80px;">
+
+        <!-- FILTERS -->
+        <div class="sf-filters">
+          <div class="sf-filter-section">
+            <div class="sf-filter-title">Plan type</div>
+            <label class="sf-filter-radio"><input type="radio" name="ptype" checked> Medicare Advantage/Part D</label>
+            <label class="sf-filter-radio"><input type="radio" name="ptype"> Part D</label>
+            <label class="sf-filter-radio"><input type="radio" name="ptype"> Medicare Supplement</label>
+            <label class="sf-filter-radio"><input type="radio" name="ptype"> Medicare Advantage</label>
+            <label class="sf-filter-radio"><input type="radio" name="ptype"> Special Needs</label>
+          </div>
+          <div class="sf-filter-section">
+            <div class="sf-filter-title">Filter by</div>
+            <div style="font-size:11px;color:var(--sf-text-light);margin-bottom:5px;">Plan features</div>
+            <label class="sf-filter-item"><input type="checkbox"> Five star rating</label>
+            <label class="sf-filter-item"><input type="checkbox"> Part B give back</label>
+            <label class="sf-filter-item"><input type="checkbox" checked> Dental coverage</label>
+            <label class="sf-filter-item"><input type="checkbox"> Vision coverage</label>
+            <label class="sf-filter-item"><input type="checkbox"> Hearing coverage</label>
+            <label class="sf-filter-item"><input type="checkbox" checked> OTC</label>
+            <label class="sf-filter-item"><input type="checkbox"> Transportation</label>
+            <label class="sf-filter-item"><input type="checkbox" checked> Fitness Benefits</label>
+            <label class="sf-filter-item"><input type="checkbox"> Chiropractic Care</label>
+            <label class="sf-filter-item"><input type="checkbox"> Additional Services</label>
+          </div>
+          <div class="sf-filter-section">
+            <div class="sf-filter-title">Preferred retail pharmacy</div>
+            <label class="sf-filter-item"><input type="checkbox" checked> CVS</label>
+            <label class="sf-filter-item"><input type="checkbox"> Walgreens</label>
+            <label class="sf-filter-item"><input type="checkbox"> Walmart</label>
+          </div>
+        </div>
+
+        <!-- PLAN CARDS -->
+        <div class="sf-plans-list">
+          <div class="sf-plan-header-row">
+            <div>Available plans</div>
+            <div style="text-align:right;">Mo. premium</div>
+            <div style="text-align:right;">Est. annual cost</div>
+            <div style="text-align:right;">Part B</div>
+            <div style="text-align:right;">DVH</div>
+            <div style="text-align:right;">OTC</div>
+            <div style="text-align:right;">Transport</div>
+          </div>
+
+          <!-- PLAN 1 — Dorothy's Current Plan -->
+          <div class="sf-plan-card current-plan">
+            <div class="sf-plan-card-top">
+              <div class="sf-plan-name-section">
+                <div class="sf-plan-badge">
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  CURRENT PLAN
+                </div>
+                <div class="sf-plan-name" onclick="togglePlanDetails('plan1')">AARP Medicare Advantage from UHC TX-0047 (HMO-POS)</div>
+                <div class="sf-plan-carrier">UnitedHealthcare · H4527-047-000</div>
+                <div class="sf-stars">★★★★☆ <span>(4.0 · 2025)</span></div>
+              </div>
+              <div class="sf-plan-col">
+                <div class="sf-plan-premium">$0.00</div>
+                <div class="sf-plan-premium-label">Monthly Plan Premium</div>
+              </div>
+              <div class="sf-plan-col">
+                <div class="sf-plan-est">$1,240</div>
+                <div class="sf-plan-small">Est. Annual Cost</div>
+              </div>
+              <div class="sf-plan-col"><div class="sf-plan-no">—</div></div>
+              <div class="sf-plan-col"><div class="sf-plan-yes">✓</div><div class="sf-plan-small">Dental, Vision, Hearing</div></div>
+              <div class="sf-plan-col"><div class="sf-plan-amt">$150/qtr</div></div>
+              <div class="sf-plan-col"><div class="sf-plan-yes">✓</div></div>
+            </div>
+            <div class="sf-plan-details" id="plan1-details" style="display:none;">
+              <div class="sf-plan-details-grid">
+                <div class="sf-detail-group">
+                  <div class="sf-detail-label">Max out-of-pocket</div>
+                  <div class="sf-detail-val">$4,900 (in-network)</div>
+                </div>
+                <div class="sf-detail-group">
+                  <div class="sf-detail-label">Medical deductible</div>
+                  <div class="sf-detail-val">$0</div>
+                </div>
+                <div class="sf-detail-group">
+                  <div class="sf-detail-label">Drug deductible</div>
+                  <div class="sf-detail-val">$0 (Tiers 1–2)</div>
+                </div>
+              </div>
+              <div style="margin-bottom:8px;">
+                <div class="sf-detail-label">Benefits</div>
+                <div class="sf-benefits-row">
+                  <div class="sf-benefit-chip">🦷 Dental</div>
+                  <div class="sf-benefit-chip">👁 Vision</div>
+                  <div class="sf-benefit-chip">👂 Hearing</div>
+                  <div class="sf-benefit-chip otc">💊 OTC $150/quarter</div>
+                  <div class="sf-benefit-chip transport">🚗 Transportation</div>
+                </div>
+                <div class="sf-notice warning" style="margin-top:8px;font-size:12px;">⚠ No standalone grocery/food card benefit on this plan. OTC benefit ($150/qtr) can be used at participating stores for eligible food items.</div>
+              </div>
+              <div style="margin-bottom:6px;">
+                <div class="sf-detail-label">Pharmacy</div>
+                <div class="sf-pharmacy-row"><span class="sf-pharmacy-name">CVS Pharmacy</span><span class="sf-pharmacy-tier">Standard</span></div>
+              </div>
+              <div>
+                <div class="sf-detail-label">Dorothy's Medications</div>
+                <div class="sf-drug-cost"><span class="zero">$0</span> Estimated Annual Drug Cost · 2 of 2 drugs covered</div>
+                <div class="sf-drug-note">✓ Save $0 with CVS, Sam's Club &amp; mail order</div>
+              </div>
+              <div style="margin-top:10px;">
+                <div class="sf-detail-label">Copays</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:12px;">
+                  <div>Primary care: <strong>$0</strong></div>
+                  <div>Specialist: <strong>$35</strong></div>
+                  <div>Urgent care: <strong>$40</strong></div>
+                </div>
+              </div>
+            </div>
+            <div class="sf-plan-actions">
+              <label class="sf-compare-check"><input type="checkbox" onchange="toggleCompare(this, 'AARP MA UHC TX-0047 (HMO-POS)')"> Compare/Email</label>
+              <button class="sf-btn sf-btn-primary sf-btn-sm">Plan Links ▾</button>
+              <button class="sf-btn sf-btn-secondary sf-btn-sm" onclick="togglePlanDetails('plan1')">Details</button>
+              <button class="sf-btn sf-btn-green sf-btn-sm" onclick="goPage('enroll')">Enroll</button>
+            </div>
+          </div>
+
+          <!-- PLAN 2 — AARP Extras (has grocery) -->
+          <div class="sf-plan-card recommended">
+            <div class="sf-plan-card-top">
+              <div class="sf-plan-name-section">
+                <div class="sf-plan-badge" style="color:var(--sf-green);">
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  RECOMMENDED · HAS GROCERY BENEFIT
+                </div>
+                <div class="sf-plan-name" onclick="togglePlanDetails('plan2')">AARP Medicare Advantage Extras from UHC TX-27 (HMO-POS)</div>
+                <div class="sf-plan-carrier">UnitedHealthcare · H4527-027-000</div>
+                <div class="sf-stars">★★★★★ <span>(4.5 · 2025)</span></div>
+              </div>
+              <div class="sf-plan-col">
+                <div class="sf-plan-premium">$0.00</div>
+                <div class="sf-plan-premium-label">Monthly Plan Premium</div>
+              </div>
+              <div class="sf-plan-col">
+                <div class="sf-plan-est">$980</div>
+                <div class="sf-plan-small">Est. Annual Cost</div>
+              </div>
+              <div class="sf-plan-col"><div class="sf-plan-no">—</div></div>
+              <div class="sf-plan-col"><div class="sf-plan-yes">✓</div><div class="sf-plan-small">Dental, Vision, Hearing</div></div>
+              <div class="sf-plan-col"><div class="sf-plan-amt">$200/qtr</div></div>
+              <div class="sf-plan-col"><div class="sf-plan-yes">✓</div></div>
+            </div>
+            <div class="sf-plan-details" id="plan2-details" style="display:block;">
+              <div class="sf-plan-details-grid">
+                <div class="sf-detail-group">
+                  <div class="sf-detail-label">Max out-of-pocket</div>
+                  <div class="sf-detail-val">$3,900 (in-network)</div>
+                </div>
+                <div class="sf-detail-group">
+                  <div class="sf-detail-label">Medical deductible</div>
+                  <div class="sf-detail-val">$0</div>
+                </div>
+                <div class="sf-detail-group">
+                  <div class="sf-detail-label">Drug deductible</div>
+                  <div class="sf-detail-val">$0 (Tiers 1–2)</div>
+                </div>
+              </div>
+              <div style="margin-bottom:8px;">
+                <div class="sf-detail-label">Benefits</div>
+                <div class="sf-benefits-row">
+                  <div class="sf-benefit-chip">🦷 Dental (comprehensive)</div>
+                  <div class="sf-benefit-chip">👁 Vision $200 allowance</div>
+                  <div class="sf-benefit-chip">👂 Hearing</div>
+                  <div class="sf-benefit-chip otc">💊 OTC $200/quarter</div>
+                  <div class="sf-benefit-chip grocery">🛒 Healthy Foods $900/year</div>
+                  <div class="sf-benefit-chip transport">🚗 Transportation (24 trips)</div>
+                </div>
+                <div class="sf-notice success" style="margin-top:8px;font-size:12px;">✓ This plan includes a $900/year Healthy Foods Benefit (Grocery Card) — loaded quarterly on UCard. Use at Walmart, Walgreens, CVS, and participating grocery stores.</div>
+              </div>
+              <div style="margin-bottom:6px;">
+                <div class="sf-detail-label">Pharmacy</div>
+                <div class="sf-pharmacy-row"><span class="sf-pharmacy-name">CVS Pharmacy</span><span class="sf-pharmacy-tier">Preferred</span></div>
+              </div>
+              <div>
+                <div class="sf-detail-label">Dorothy's Medications</div>
+                <div class="sf-drug-cost"><span class="zero">$0</span> Estimated Annual Drug Cost · 2 of 2 drugs covered</div>
+                <div class="sf-drug-note">✓ Save $0 with CVS preferred network</div>
+              </div>
+              <div style="margin-top:10px;">
+                <div class="sf-detail-label">Copays</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:12px;">
+                  <div>Primary care: <strong>$0</strong></div>
+                  <div>Specialist: <strong>$20</strong></div>
+                  <div>Urgent care: <strong>$30</strong></div>
+                </div>
+              </div>
+              <div style="margin-top:10px;">
+                <div class="sf-detail-label">Dr. Robert Chen — In-network status</div>
+                <div class="sf-notice success" style="font-size:12px;margin-top:4px;">✓ In-network at North Texas Family Clinic, Anna TX — 5 locations</div>
+              </div>
+            </div>
+            <div class="sf-plan-actions">
+              <label class="sf-compare-check"><input type="checkbox" onchange="toggleCompare(this, 'AARP MA Extras TX-27 (HMO-POS)')"> Compare/Email</label>
+              <button class="sf-btn sf-btn-primary sf-btn-sm">Plan Links ▾</button>
+              <button class="sf-btn sf-btn-secondary sf-btn-sm" onclick="togglePlanDetails('plan2')">Details</button>
+              <button class="sf-btn sf-btn-green sf-btn-sm" onclick="goPage('enroll')">Enroll</button>
+            </div>
+          </div>
+
+          <!-- PLAN 3 -->
+          <div class="sf-plan-card">
+            <div class="sf-plan-card-top">
+              <div class="sf-plan-name-section">
+                <div class="sf-plan-name" onclick="togglePlanDetails('plan3')">AARP Medicare Advantage Essentials from UHC TX-22 (HMO-POS)</div>
+                <div class="sf-plan-carrier">UnitedHealthcare · H4527-022-000</div>
+                <div class="sf-stars">★★★★☆ <span>(4.0 · 2025)</span></div>
+              </div>
+              <div class="sf-plan-col"><div class="sf-plan-premium">$0.00</div><div class="sf-plan-premium-label">Monthly Plan Premium</div></div>
+              <div class="sf-plan-col"><div class="sf-plan-est">$1,480</div><div class="sf-plan-small">Est. Annual Cost</div></div>
+              <div class="sf-plan-col"><div class="sf-plan-no">—</div></div>
+              <div class="sf-plan-col"><div class="sf-plan-yes">✓</div><div class="sf-plan-small">Dental, Vision</div></div>
+              <div class="sf-plan-col"><div class="sf-plan-amt">$100/qtr</div></div>
+              <div class="sf-plan-col"><div class="sf-plan-no">—</div></div>
+            </div>
+            <div class="sf-plan-details" id="plan3-details" style="display:none;">
+              <div class="sf-plan-details-grid">
+                <div class="sf-detail-group"><div class="sf-detail-label">Max out-of-pocket</div><div class="sf-detail-val">$6,700 (in-network)</div></div>
+                <div class="sf-detail-group"><div class="sf-detail-label">Medical deductible</div><div class="sf-detail-val">$0</div></div>
+                <div class="sf-detail-group"><div class="sf-detail-label">Drug deductible</div><div class="sf-detail-val">$340</div></div>
+              </div>
+              <div class="sf-benefits-row">
+                <div class="sf-benefit-chip">🦷 Dental (preventive)</div>
+                <div class="sf-benefit-chip">👁 Vision $100 allowance</div>
+                <div class="sf-benefit-chip otc">💊 OTC $100/quarter</div>
+              </div>
+              <div class="sf-notice warning" style="margin-top:8px;font-size:12px;">No grocery/food card benefit on this plan.</div>
+              <div style="margin-top:8px;font-size:12px;color:var(--sf-text-light);">Primary care: $0 · Specialist: $45 · Urgent care: $45</div>
+            </div>
+            <div class="sf-plan-actions">
+              <label class="sf-compare-check"><input type="checkbox" onchange="toggleCompare(this, 'AARP MA Essentials TX-22 (HMO-POS)')"> Compare/Email</label>
+              <button class="sf-btn sf-btn-primary sf-btn-sm">Plan Links ▾</button>
+              <button class="sf-btn sf-btn-secondary sf-btn-sm" onclick="togglePlanDetails('plan3')">Details</button>
+              <button class="sf-btn sf-btn-green sf-btn-sm" onclick="goPage('enroll')">Enroll</button>
+            </div>
+          </div>
+
+          <!-- PLAN 4 -->
+          <div class="sf-plan-card">
+            <div class="sf-plan-card-top">
+              <div class="sf-plan-name-section">
+                <div class="sf-plan-name" onclick="togglePlanDetails('plan4')">AARP Medicare Advantage from UHC TX-0005 (PPO)</div>
+                <div class="sf-plan-carrier">UnitedHealthcare · H1278-013-000</div>
+                <div class="sf-stars">★★★★☆ <span>(4.0 · 2025)</span></div>
+              </div>
+              <div class="sf-plan-col"><div class="sf-plan-premium">$0.00</div><div class="sf-plan-premium-label">Monthly Plan Premium</div></div>
+              <div class="sf-plan-col"><div class="sf-plan-est">$1,680</div><div class="sf-plan-small">Est. Annual Cost</div></div>
+              <div class="sf-plan-col"><div class="sf-plan-no">—</div></div>
+              <div class="sf-plan-col"><div class="sf-plan-yes">✓</div><div class="sf-plan-small">Dental, Vision, Hearing</div></div>
+              <div class="sf-plan-col"><div class="sf-plan-amt">$100/qtr</div></div>
+              <div class="sf-plan-col"><div class="sf-plan-yes">✓</div></div>
+            </div>
+            <div class="sf-plan-details" id="plan4-details" style="display:none;">
+              <div class="sf-plan-details-grid">
+                <div class="sf-detail-group"><div class="sf-detail-label">Max out-of-pocket</div><div class="sf-detail-val">$6,700 in-network / $11,000 combined</div></div>
+                <div class="sf-detail-group"><div class="sf-detail-label">Medical deductible</div><div class="sf-detail-val">$0</div></div>
+                <div class="sf-detail-group"><div class="sf-detail-label">Drug deductible</div><div class="sf-detail-val">$420</div></div>
+              </div>
+              <div class="sf-benefits-row">
+                <div class="sf-benefit-chip">🦷 Dental (comprehensive)</div>
+                <div class="sf-benefit-chip">👁 Vision</div>
+                <div class="sf-benefit-chip">👂 Hearing</div>
+                <div class="sf-benefit-chip otc">💊 OTC $100/quarter</div>
+                <div class="sf-benefit-chip transport">🚗 Transportation</div>
+              </div>
+              <div class="sf-notice info" style="margin-top:8px;font-size:12px;">ℹ PPO — this plan allows out of network doctors. Higher cost share applies for out-of-network care.</div>
+              <div class="sf-notice warning" style="font-size:12px;">No dedicated grocery/food card benefit.</div>
+              <div style="margin-top:8px;font-size:12px;color:var(--sf-text-light);">Primary care: $0 · Specialist: $0–$35 · Urgent care: $35</div>
+            </div>
+            <div class="sf-plan-actions">
+              <label class="sf-compare-check"><input type="checkbox" onchange="toggleCompare(this, 'AARP MA UHC TX-0005 (PPO)')"> Compare/Email</label>
+              <button class="sf-btn sf-btn-primary sf-btn-sm">Plan Links ▾</button>
+              <button class="sf-btn sf-btn-secondary sf-btn-sm" onclick="togglePlanDetails('plan4')">Details</button>
+              <button class="sf-btn sf-btn-green sf-btn-sm" onclick="goPage('enroll')">Enroll</button>
+            </div>
+          </div>
+
+          <!-- PLAN 5 — Humana -->
+          <div class="sf-plan-card">
+            <div class="sf-plan-card-top">
+              <div class="sf-plan-name-section">
+                <div class="sf-plan-name" onclick="togglePlanDetails('plan5')">Humana Gold Plus H5619-062 (HMO)</div>
+                <div class="sf-plan-carrier">Humana · H5619-062-000</div>
+                <div class="sf-stars">★★★★☆ <span>(4.0 · 2025)</span></div>
+              </div>
+              <div class="sf-plan-col"><div class="sf-plan-premium">$0.00</div><div class="sf-plan-premium-label">Monthly Plan Premium</div></div>
+              <div class="sf-plan-col"><div class="sf-plan-est">$1,120</div><div class="sf-plan-small">Est. Annual Cost</div></div>
+              <div class="sf-plan-col"><div class="sf-plan-no">—</div></div>
+              <div class="sf-plan-col"><div class="sf-plan-yes">✓</div><div class="sf-plan-small">Dental, Vision, Hearing</div></div>
+              <div class="sf-plan-col"><div class="sf-plan-amt">$75/qtr</div></div>
+              <div class="sf-plan-col"><div class="sf-plan-no">—</div></div>
+            </div>
+            <div class="sf-plan-details" id="plan5-details" style="display:none;">
+              <div class="sf-plan-details-grid">
+                <div class="sf-detail-group"><div class="sf-detail-label">Max out-of-pocket</div><div class="sf-detail-val">$5,900 (in-network)</div></div>
+                <div class="sf-detail-group"><div class="sf-detail-label">Medical deductible</div><div class="sf-detail-val">$0</div></div>
+                <div class="sf-detail-group"><div class="sf-detail-label">Drug deductible</div><div class="sf-detail-val">$0</div></div>
+              </div>
+              <div class="sf-benefits-row">
+                <div class="sf-benefit-chip">🦷 Dental</div>
+                <div class="sf-benefit-chip">👁 Vision</div>
+                <div class="sf-benefit-chip">👂 Hearing</div>
+                <div class="sf-benefit-chip otc">💊 OTC $75/quarter</div>
+              </div>
+              <div class="sf-notice warning" style="margin-top:8px;font-size:12px;">HMO — must use Humana network providers. Dr. Robert Chen: verify network status.</div>
+              <div class="sf-notice warning" style="font-size:12px;">No grocery/food card benefit on this plan.</div>
+              <div style="margin-top:8px;font-size:12px;color:var(--sf-text-light);">Primary care: $0 · Specialist: $35 · Urgent care: $40</div>
+            </div>
+            <div class="sf-plan-actions">
+              <label class="sf-compare-check"><input type="checkbox" onchange="toggleCompare(this, 'Humana Gold Plus (HMO)')"> Compare/Email</label>
+              <button class="sf-btn sf-btn-primary sf-btn-sm">Plan Links ▾</button>
+              <button class="sf-btn sf-btn-secondary sf-btn-sm" onclick="togglePlanDetails('plan5')">Details</button>
+              <button class="sf-btn sf-btn-green sf-btn-sm" onclick="goPage('enroll')">Enroll</button>
+            </div>
+          </div>
+
+          <!-- PLAN 6 — Aetna -->
+          <div class="sf-plan-card">
+            <div class="sf-plan-card-top">
+              <div class="sf-plan-name-section">
+                <div class="sf-plan-name" onclick="togglePlanDetails('plan6')">Aetna Medicare Prime Care (HMO)</div>
+                <div class="sf-plan-carrier">Aetna · H4523-021-000</div>
+                <div class="sf-stars">★★★★☆ <span>(4.0 · 2025)</span></div>
+              </div>
+              <div class="sf-plan-col"><div class="sf-plan-premium">$0.00</div><div class="sf-plan-premium-label">Monthly Plan Premium</div></div>
+              <div class="sf-plan-col"><div class="sf-plan-est">$1,390</div><div class="sf-plan-small">Est. Annual Cost</div></div>
+              <div class="sf-plan-col"><div class="sf-plan-no">—</div></div>
+              <div class="sf-plan-col"><div class="sf-plan-yes">✓</div><div class="sf-plan-small">Dental, Vision, Hearing</div></div>
+              <div class="sf-plan-col"><div class="sf-plan-amt">$120/qtr</div></div>
+              <div class="sf-plan-col"><div class="sf-plan-no">—</div></div>
+            </div>
+            <div class="sf-plan-details" id="plan6-details" style="display:none;">
+              <div class="sf-plan-details-grid">
+                <div class="sf-detail-group"><div class="sf-detail-label">Max out-of-pocket</div><div class="sf-detail-val">$4,200 (in-network)</div></div>
+                <div class="sf-detail-group"><div class="sf-detail-label">Medical deductible</div><div class="sf-detail-val">$0</div></div>
+                <div class="sf-detail-group"><div class="sf-detail-label">Drug deductible</div><div class="sf-detail-val">$615</div></div>
+              </div>
+              <div class="sf-benefits-row">
+                <div class="sf-benefit-chip">🦷 Dental</div>
+                <div class="sf-benefit-chip">👁 Vision</div>
+                <div class="sf-benefit-chip">👂 Hearing</div>
+                <div class="sf-benefit-chip otc">💊 OTC $120/quarter</div>
+              </div>
+              <div class="sf-notice warning" style="margin-top:8px;font-size:12px;">No grocery/food card benefit. High drug deductible ($615) — important for Metformin coverage.</div>
+              <div style="margin-top:8px;font-size:12px;color:var(--sf-text-light);">Primary care: $0 · Specialist: $40 · Urgent care: $40</div>
+            </div>
+            <div class="sf-plan-actions">
+              <label class="sf-compare-check"><input type="checkbox" onchange="toggleCompare(this, 'Aetna Medicare Prime Care (HMO)')"> Compare/Email</label>
+              <button class="sf-btn sf-btn-primary sf-btn-sm">Plan Links ▾</button>
+              <button class="sf-btn sf-btn-secondary sf-btn-sm" onclick="togglePlanDetails('plan6')">Details</button>
+              <button class="sf-btn sf-btn-green sf-btn-sm" onclick="goPage('enroll')">Enroll</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PAGE: ENROLLMENT -->
+    <div class="page" id="page-enroll" style="padding:24px 28px;max-width:700px;">
+      <div class="sf-section-title">Enrollment — AARP Medicare Advantage Extras from UHC TX-27</div>
+
+      <div class="sf-notice info">
+        To begin enrolling, please provide this important information. You'll be able to review your information before submitting your application.
+        <br><span style="font-size:11px;margin-top:4px;display:block;">Fields marked with an asterisk (*) are required</span>
+      </div>
+
+      <div class="sf-card">
+        <div class="sf-card-title">Personal Information</div>
+        <div class="sf-row-3">
+          <div class="sf-field">
+            <label class="sf-label">First name<span class="req">*</span></label>
+            <input type="text" class="sf-input prefilled" value="Dorothy">
+          </div>
+          <div class="sf-field">
+            <label class="sf-label">Middle Initial</label>
+            <input type="text" class="sf-input" value="">
+          </div>
+          <div class="sf-field">
+            <label class="sf-label">Last name<span class="req">*</span></label>
+            <input type="text" class="sf-input prefilled" value="Miller">
+          </div>
+        </div>
+        <div class="sf-row">
+          <div class="sf-field">
+            <label class="sf-label">Date of birth<span class="req">*</span></label>
+            <div class="sf-input-date">
+              <input type="text" class="sf-input prefilled" value="09" style="width:55px;text-align:center;">
+              <span>/</span>
+              <input type="text" class="sf-input prefilled" value="04" style="width:55px;text-align:center;">
+              <span>/</span>
+              <input type="text" class="sf-input prefilled" value="1952" style="width:75px;text-align:center;">
+            </div>
+          </div>
+          <div class="sf-field">
+            <label class="sf-label">Sex<span class="req">*</span></label>
+            <div class="sf-radio-group">
+              <div class="sf-radio-btn">Male</div>
+              <div class="sf-radio-btn selected">Female</div>
+            </div>
+          </div>
+        </div>
+        <div class="sf-field">
+          <label class="sf-label">Phone</label>
+          <input type="text" class="sf-input prefilled" value="(469) 555-0317">
+        </div>
+        <div style="font-size:12px;color:var(--sf-text-light);margin-bottom:12px;">There may be times when UnitedHealthcare will use an automated system to call or text you at the telephone number you provided.</div>
+        <div class="sf-field">
+          <label class="sf-label">Email address</label>
+          <input type="text" class="sf-input" placeholder="">
+        </div>
+      </div>
+
+      <div class="sf-card">
+        <div class="sf-card-title">Address</div>
+        <div class="sf-field">
+          <label class="sf-label">Residential address<span class="req">*</span></label>
+          <input type="text" class="sf-input prefilled" value="847 Willow Creek Drive, Anna, TX, USA">
+        </div>
+        <div class="sf-field">
+          <label class="sf-label">Apt/Unit/Suite</label>
+          <input type="text" class="sf-input" placeholder="">
+        </div>
+        <div class="sf-row">
+          <div class="sf-field">
+            <label class="sf-label">City<span class="req">*</span></label>
+            <input type="text" class="sf-input prefilled" value="Anna">
+          </div>
+          <div class="sf-field">
+            <label class="sf-label">ZIP code<span class="req">*</span></label>
+            <input type="text" class="sf-input prefilled" value="75409">
+          </div>
+        </div>
+      </div>
+
+      <div class="sf-card">
+        <div class="sf-card-title">Medicare Card</div>
+        <div class="sf-medicare-card">
+          <div class="mc-title">MEDICARE HEALTH INSURANCE</div>
+          <div class="mc-label">Name/Nombre</div>
+          <div class="mc-name">DOROTHY MILLER</div>
+          <div class="mc-label">Medicare Number/Número de Medicare</div>
+          <div class="mc-number">2HJ7-RF4-NP61</div>
+          <div class="mc-row">
+            <div class="mc-part">
+              <div class="mc-part-label">Entitled to</div>
+              <div class="mc-part-name">HOSPITAL (PART A)</div>
+              <div class="mc-part-date">09-01-2017</div>
+            </div>
+            <div class="mc-part">
+              <div class="mc-part-label">Entitled to</div>
+              <div class="mc-part-name">MEDICAL (PART B)</div>
+              <div class="mc-part-date">09-01-2017</div>
+            </div>
+          </div>
+          <div class="mc-red"></div>
+        </div>
+
+        <div class="sf-row">
+          <div class="sf-field">
+            <label class="sf-label">Name (as it appears on your Medicare card)<span class="req">*</span></label>
+            <input type="text" class="sf-input prefilled" value="DOROTHY MILLER">
+          </div>
+          <div class="sf-field">
+            <label class="sf-label">Medicare number<span class="req">*</span></label>
+            <input type="text" class="sf-input prefilled" value="2HJ7RF4NP61">
+            <div style="font-size:11px;color:var(--sf-text-light);margin-top:3px;">Hint: Do not enter dashes</div>
+          </div>
+        </div>
+        <div class="sf-row">
+          <div class="sf-field">
+            <label class="sf-label">Hospital (Part A)<span class="req">*</span></label>
+            <div class="sf-input-date">
+              <input type="text" class="sf-input prefilled" value="09" style="width:55px;text-align:center;">
+              <span>/</span>
+              <input type="text" class="sf-input prefilled" value="01" style="width:55px;text-align:center;">
+              <span>/</span>
+              <input type="text" class="sf-input prefilled" value="2017" style="width:75px;text-align:center;">
+            </div>
+          </div>
+          <div class="sf-field">
+            <label class="sf-label">Medical (Part B)<span class="req">*</span></label>
+            <div class="sf-input-date">
+              <input type="text" class="sf-input prefilled" value="09" style="width:55px;text-align:center;">
+              <span>/</span>
+              <input type="text" class="sf-input prefilled" value="01" style="width:55px;text-align:center;">
+              <span>/</span>
+              <input type="text" class="sf-input prefilled" value="2017" style="width:75px;text-align:center;">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sf-card">
+        <div class="sf-card-title">Provider Information</div>
+        <p style="font-size:13px;margin-bottom:12px;">Do you wish to specify a primary care physician (PCP) now?</p>
+        <div class="sf-radio-group" style="margin-bottom:14px;">
+          <div class="sf-radio-btn selected">Yes</div>
+          <div class="sf-radio-btn">No</div>
+        </div>
+        <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:4px;padding:14px;">
+          <div class="sf-row">
+            <div class="sf-field" style="margin-bottom:6px;">
+              <label class="sf-label">PCP ID<span class="req">*</span></label>
+              <input type="text" class="sf-input prefilled" value="000148392">
+            </div>
+            <div class="sf-field" style="margin-bottom:6px;">
+              <label class="sf-label">PCP name<span class="req">*</span></label>
+              <input type="text" class="sf-input prefilled" value="CHEN, ROBERT">
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--sf-green);">✓ Dr. Robert Chen confirmed in-network · North Texas Family Clinic, Anna TX</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:16px;">
+        <button class="sf-btn sf-btn-secondary" onclick="goPage('plans')">← Back to Plans</button>
+        <button class="sf-btn sf-btn-green" style="padding:12px 28px;" onclick="showEnrollSuccess()">Review &amp; Submit Application →</button>
+      </div>
+
+      <div id="enroll-success" style="display:none;margin-top:16px;">
+        <div class="sf-notice success" style="font-size:14px;padding:16px;">
+          ✓ <strong>Application Submitted Successfully</strong><br>
+          <span style="font-size:12px;">Dorothy Miller has been enrolled in AARP Medicare Advantage Extras from UHC TX-27. Confirmation #: TRN-2025-0414-DM</span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- COMPARE BAR -->
+<div class="sf-compare-bar" id="compare-bar">
+  <span class="sf-compare-label">Compare plans:</span>
+  <div class="sf-compare-slot empty" id="compare-slot-1">Select a plan</div>
+  <div class="sf-compare-slot empty" id="compare-slot-2">Select a plan</div>
+  <div class="sf-compare-slot empty" id="compare-slot-3">Select another plan</div>
+  <button class="sf-btn sf-btn-primary sf-btn-sm" id="compare-btn" disabled>Compare</button>
+  <button class="sf-btn sf-btn-secondary sf-btn-sm" onclick="clearCompare()">Cancel</button>
+  <div style="font-size:11px;opacity:0.7;margin-left:4px;">*Plans in gray above do not support online enrollment</div>
+</div>
+
+<script>
+// ── PAGE NAVIGATION ──────────────────────────────────────────
+const pages = ['dashboard','profile','doctors','meds','focus','plans','enroll'];
+
+function goPage(id) {
+  pages.forEach(p => {
+    const el = document.getElementById('page-' + p);
+    if (el) el.classList.remove('active');
+  });
+  const nav = document.querySelectorAll('.sf-nav-item');
+  nav.forEach(n => n.classList.remove('active'));
+
+  const page = document.getElementById('page-' + id);
+  if (page) page.classList.add('active');
+
+  // highlight sidebar
+  if (id === 'dashboard') nav[0].classList.add('active');
+  else if (['profile','doctors','meds','focus','plans','enroll'].includes(id)) nav[1].classList.add('active');
+
+  window.scrollTo(0, 0);
+}
+
+// ── PLAN DETAILS TOGGLE ──────────────────────────────────────
+function togglePlanDetails(id) {
+  const el = document.getElementById(id + '-details');
+  if (!el) return;
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+// ── RADIO BUTTONS ────────────────────────────────────────────
+function selectRadio(group, el) {
+  el.parentElement.querySelectorAll('.sf-radio-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// ── DOCTOR SEARCH ────────────────────────────────────────────
+function filterDoctors(val) {
+  const dd = document.getElementById('doctor-dropdown');
+  dd.style.display = val.length > 1 ? 'block' : 'none';
+}
+
+function selectDoctor(name, addr) {
+  document.getElementById('doctor-search').value = '';
+  document.getElementById('doctor-dropdown').style.display = 'none';
+  // already pre-populated for Dorothy
+}
+
+// ── COMPARE ──────────────────────────────────────────────────
+let compareList = [];
+
+function toggleCompare(cb, planName) {
+  if (cb.checked) {
+    if (compareList.length >= 3) { cb.checked = false; return; }
+    compareList.push(planName);
+  } else {
+    compareList = compareList.filter(p => p !== planName);
+  }
+  updateCompareBar();
+}
+
+function updateCompareBar() {
+  const bar = document.getElementById('compare-bar');
+  const slots = [
+    document.getElementById('compare-slot-1'),
+    document.getElementById('compare-slot-2'),
+    document.getElementById('compare-slot-3')
+  ];
+  const btn = document.getElementById('compare-btn');
+
+  if (compareList.length > 0) {
+    bar.classList.add('show');
+    slots.forEach((slot, i) => {
+      if (compareList[i]) {
+        slot.className = 'sf-compare-slot';
+        slot.innerHTML = compareList[i] + ' <span class="x" onclick="removeCompare(' + i + ')">✕</span>';
+      } else {
+        slot.className = 'sf-compare-slot empty';
+        slot.textContent = i === 2 ? 'Select another plan' : 'Select a plan';
+      }
+    });
+    btn.disabled = compareList.length < 2;
+  } else {
+    bar.classList.remove('show');
+  }
+}
+
+function removeCompare(idx) {
+  compareList.splice(idx, 1);
+  // uncheck all, re-check remaining
+  document.querySelectorAll('.sf-compare-check input').forEach(cb => {
+    cb.checked = compareList.includes(cb.parentElement.parentElement.querySelector('.sf-plan-name')?.textContent?.trim()?.substring(0, 20));
+  });
+  updateCompareBar();
+}
+
+function clearCompare() {
+  compareList = [];
+  document.querySelectorAll('.sf-compare-check input').forEach(cb => cb.checked = false);
+  updateCompareBar();
+}
+
+// ── ENROLLMENT SUCCESS ───────────────────────────────────────
+function showEnrollSuccess() {
+  document.getElementById('enroll-success').style.display = 'block';
+  document.getElementById('enroll-success').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ── FOCUS LIMIT ──────────────────────────────────────────────
+function updateFocus() {
+  const checks = document.querySelectorAll('#focus-checks input[type=checkbox]');
+  const checked = Array.from(checks).filter(c => c.checked).length;
+  if (checked > 3) {
+    event.target.checked = false;
+  }
+}
+</script>
+
+</body>
+</html>
